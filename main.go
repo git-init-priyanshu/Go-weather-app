@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -21,17 +22,16 @@ type weaterhData struct {
 func loadEnv(filename string) (envVariable, error) {
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
+		fmt.Print("error while getting envFile")
 		return envVariable{}, err
 	}
 
 	var env envVariable
-	fmt.Print("bytes", bytes)
+
 	err = json.Unmarshal(bytes, &env)
 	if err != nil {
-    fmt.Print("error while Unmarshalling")
 		return envVariable{}, err
 	}
-	fmt.Print("env", env)
 	return env, nil
 }
 func getWeather(city string) (weaterhData, error) {
@@ -59,7 +59,7 @@ func getWeather(city string) (weaterhData, error) {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		env, err := loadEnv("./envFile")
+		env, err := loadEnv("envFile")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -78,6 +78,6 @@ func main() {
 		json.NewEncoder(w).Encode(data)
 	})
 
-	http.ListenAndServe(":8080", nil)
-
+	fmt.Print("Listening on port :8000")
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }
